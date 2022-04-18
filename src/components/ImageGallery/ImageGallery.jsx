@@ -1,7 +1,8 @@
 import { GalleryList } from './ImageGallery.styled';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import PropTypes from 'prop-types';
 
-export const ImageGallery = ({ images }) => {
+export const ImageGallery = ({ images, togleModal, modalImage }) => {
   return (
     <GalleryList>
       {images.map(({ id, webformatURL, largeImageURL }) => (
@@ -9,8 +10,16 @@ export const ImageGallery = ({ images }) => {
           key={id}
           smallImage={webformatURL}
           largeImage={largeImageURL}
+          togleModal={togleModal}
+          modalImage={modalImage}
         />
       ))}
     </GalleryList>
   );
+};
+
+ImageGallery.propTypes = {
+  images: PropTypes.array,
+  togleModal: PropTypes.func.isRequired,
+  modalImage: PropTypes.func.isRequired,
 };

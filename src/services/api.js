@@ -16,7 +16,7 @@ const api = async (search, pageAmount) => {
   };
   const responce = await axios.get(URL, options);
 
-  if (!responce) {
+  if (responce.data.total === 0) {
     return Promise.reject(new Error('Not found!'));
   }
 

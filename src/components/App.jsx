@@ -5,8 +5,9 @@ import { getApi } from 'services/api';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Main } from './App.styled';
-
-import { smoothScroll } from 'services/scroll';
+import { ErrorMessage } from './ErrorMessage/ErrorMessage';
+import { Modal } from './Modal/Modal';
+import * as Scroll from 'react-scroll';
 
 const Status = {
   IDLE: 'idle',
@@ -19,8 +20,11 @@ const Status = {
 export class App extends Component {
   state = {
     search: '',
+    modalImage: '',
     page: 1,
     images: [],
+    error: null,
+    showModal: false,
     status: Status.IDLE,
   };
 
@@ -42,7 +46,6 @@ export class App extends Component {
     if (nextPage > prevPage) {
       this.loadImage();
     }
-    smoothScroll();
   }
 
   loadImage = () => {
@@ -57,10 +60,11 @@ export class App extends Component {
           status: Status.RESOLVED,
         }));
       })
-      .catch(this.setState({ status: Status.REJECTED }));
+      .catch(error => this.setState({ error, status: Status.REJECTED }));
   };
 
   loadMore = () => {
+    Scroll.animateScroll.scrollMore(500);
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
@@ -70,16 +74,35 @@ export class App extends Component {
     this.setState({ search: name, page: 1 });
   };
 
+  togleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  };
+
+  modalImage = image => {
+    this.setState({ modalImage: image });
+  };
+
   render() {
-    const { status } = this.state;
+    const { status, error, showModal, modalImage } = this.state;
+
     return (
       <Main>
         <Searchbar onSubmit={this.onSearchName} />
         {status === Status.RESOLVED && (
-          <ImageGallery images={this.state.images} />
+          <>
+            <ImageGallery
+              images={this.state.images}
+              modalImage={this.modalImage}
+              togleModal={this.togleModal}
+            />
+            <Button onClick={this.loadMore} />
+          </>
         )}
         {status === Status.PENDING && <Loader />}
-        <Button onClick={this.loadMore} />
+        {status === Status.REJECTED && <ErrorMessage message={error.message} />}
+        {showModal && (
+          <Modal onClose={this.togleModal} modalImage={modalImage} />
+        )}
       </Main>
     );
   }
