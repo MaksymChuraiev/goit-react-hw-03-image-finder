@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = async (search, pageAmount) => {
+export const getApi = async (search, pageAmount) => {
   // const key = '25261319-41493d7d09d351884ef55fa82';
   const URL = 'https://pixabay.com/api/';
   const options = {
@@ -16,11 +16,19 @@ const api = async (search, pageAmount) => {
   };
   const responce = await axios.get(URL, options);
 
+  const renderResponce = responce.data.hits.map(
+    ({ id, largeImageURL, webformatURL }) => ({
+      id,
+      largeImageURL,
+      webformatURL,
+    })
+  );
+
   if (responce.data.total === 0) {
     return Promise.reject(new Error('Not found!'));
   }
 
-  return responce;
+  return renderResponce;
 };
 
-export const getApi = { api };
+// export const getApi = { api };

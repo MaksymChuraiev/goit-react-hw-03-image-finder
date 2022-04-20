@@ -19,7 +19,13 @@ export const ImageGallery = ({ images, togleModal, modalImage }) => {
 };
 
 ImageGallery.propTypes = {
-  images: PropTypes.array,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   togleModal: PropTypes.func.isRequired,
   modalImage: PropTypes.func.isRequired,
 };

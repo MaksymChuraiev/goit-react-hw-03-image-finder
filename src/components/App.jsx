@@ -25,12 +25,9 @@ export class App extends Component {
     images: [],
     error: null,
     showModal: false,
+
     status: Status.IDLE,
   };
-
-  componentDidMount() {
-    this.setState({ images: [] });
-  }
 
   componentDidUpdate(prevProps, prevState) {
     const prevSearch = prevState.search;
@@ -52,11 +49,10 @@ export class App extends Component {
     const { search, page } = this.state;
     this.setState({ status: Status.PENDING });
 
-    getApi
-      .api(search, page)
+    getApi(search, page)
       .then(res => {
         this.setState(prevState => ({
-          images: [...prevState.images, ...res.data.hits],
+          images: [...prevState.images, ...res],
           status: Status.RESOLVED,
         }));
       })
@@ -83,22 +79,20 @@ export class App extends Component {
   };
 
   render() {
-    const { status, error, showModal, modalImage } = this.state;
+    const { status, error, showModal, modalImage, images } = this.state;
 
     return (
       <Main>
         <Searchbar onSubmit={this.onSearchName} />
-        {status === Status.RESOLVED && (
-          <>
-            <ImageGallery
-              images={this.state.images}
-              modalImage={this.modalImage}
-              togleModal={this.togleModal}
-            />
-            <Button onClick={this.loadMore} />
-          </>
+        {images.length > 0 && (
+          <ImageGallery
+            images={images}
+            modalImage={this.modalImage}
+            togleModal={this.togleModal}
+          />
         )}
         {status === Status.PENDING && <Loader />}
+        {status === Status.RESOLVED && <Button onClick={this.loadMore} />}
         {status === Status.REJECTED && <ErrorMessage message={error.message} />}
         {showModal && (
           <Modal onClose={this.togleModal} modalImage={modalImage} />
